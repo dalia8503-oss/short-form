@@ -670,7 +670,7 @@ _DRAFT_PREFIXES = (
 def save_draft() -> None:
     draft = {}
     for k, v in st.session_state.items():
-        if k.startswith(_DRAFT_PREFIXES) or k == "creator_name":
+        if k.startswith(_DRAFT_PREFIXES):
             try:
                 json.dumps(v)
                 draft[k] = v
@@ -841,6 +841,25 @@ def main():
             "- 회사 보안정책 및 개인정보 보호 기준을 준수하세요.\n\n"
         )
 
+    with st.expander("📖 사용방법", expanded=False):
+        st.markdown(
+            "**① 사진 및 자막 설정**\n"
+            "- 현장·작업 사진을 업로드하세요 (JPG, PNG, WEBP 등).\n"
+            "- 사진별로 위험유형과 말투를 선택하면 자막이 자동 생성됩니다.\n"
+            "- 자막 내용을 직접 수정할 수 있습니다.\n"
+            "- 사진 순서는 '사진 순서 조정' 메뉴에서 바꿀 수 있습니다.\n\n"
+            "**② 오디오 및 리소스**\n"
+            "- 사진별로 효과음을 선택하거나 배경음악(MP3 등)을 업로드하세요.\n"
+            "- 배경음악 없이도 영상 제작이 가능합니다.\n\n"
+            "**③ 영상 제작**\n"
+            "- 왼쪽 사이드바에서 영상 비율, 재생 시간, 자막 스타일 등을 설정하세요.\n"
+            "- 보안 확인란을 체크한 후 **'영상 렌더링 시작'** 버튼을 누르세요.\n"
+            "- 제작 완료 후 MP4 파일을 다운로드할 수 있습니다.\n\n"
+            "**임시저장 / 초기화**\n"
+            "- 사이드바의 **'임시저장'** 버튼으로 작업 내용을 저장할 수 있습니다.\n"
+            "- **'모든 설정 초기화'** 버튼을 누르면 처음 상태로 돌아갑니다.\n"
+        )
+
     # ══════════════════════════════════════════════════════
     # 사이드바 설정
     # ══════════════════════════════════════════════════════
@@ -864,10 +883,6 @@ def main():
         bgm_volume = st.slider("배경음악 볼륨", 0.0, 1.0, 0.25, 0.05, key="_cfg_bgm_vol")
 
         st.divider()
-        st.markdown("**📝 제작자 정보**")
-        creator_name = st.text_input("제작자명 (로그 기록용)", placeholder="소속 및 성명", key="creator_name")
-
-        st.divider()
         if st.button("💾 임시저장", use_container_width=True):
             save_draft()
             st.toast("💾 임시저장이 완료되었습니다!")
@@ -880,7 +895,7 @@ def main():
             clear_draft()
             for k in list(st.session_state.keys()):
                 if k.startswith(_DRAFT_PREFIXES) or k in (
-                    "creator_name", "_draft_filenames", "_draft_loaded",
+                    "_draft_filenames", "_draft_loaded",
                     "_order_indices", "_order_names", "_draft_saved_at",
                 ):
                     del st.session_state[k]
@@ -1122,18 +1137,15 @@ def main():
 
         has_images       = bool(up_imgs) and bool(image_paths)
         has_all_captions = has_images and all(c.strip() for c in final_captions)
-        has_creator      = bool(creator_name.strip())
 
         if not has_images:
             st.error("📌 사진이 업로드되지 않았습니다.")
         elif not has_all_captions:
             st.error("📌 모든 사진에 자막이 입력되어야 합니다.")
-        elif not has_creator:
-            st.error("📌 사이드바에서 '제작자명'을 입력해주세요.")
         elif not approval_checked:
             st.warning("📌 확인란을 체크해야 제작 버튼이 활성화됩니다.")
 
-        btn_disabled = not has_images or not has_all_captions or not has_creator or not approval_checked
+        btn_disabled = not has_images or not has_all_captions or not approval_checked
 
         make_clicked = st.button(
             "🎬 숏폼 영상 렌더링 시작",
@@ -1167,7 +1179,6 @@ def main():
                 approval_checked  = approval_checked,
                 selected_emojis   = final_emojis,
                 selected_sfx      = final_sfx_names,
-                creator_name      = creator_name,
                 rotations         = rotations,
             )
 
@@ -1193,7 +1204,6 @@ def _run_pipeline(
     approval_checked: bool,
     selected_emojis: list,
     selected_sfx: list,
-    creator_name: str,
     rotations: list = None,
 ) -> None:
     tmp_audio:  Optional[str] = None
@@ -1258,7 +1268,6 @@ def _run_pipeline(
         tone_log = [st.session_state.get(f"tone_{i}", "") for i in range(len(image_paths))]
         
         save_production_log(
-            creator_name         = creator_name,
             image_count          = len(image_paths),
             image_filenames      = image_filenames,
             aspect_ratio         = aspect_label,
