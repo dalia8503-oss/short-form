@@ -1,0 +1,15 @@
+# 안전 교육 숏폼 영상 제작기 의존성
+# 설치: pip install -r requirements.txt
+#
+# ※ moviepy 2.x 버전을 사용합니다 (1.x와 API가 다릅니다).
+# ※ imageio-ffmpeg 가 FFmpeg 바이너리를 자동 포함하므로
+#    Windows에서 FFmpeg를 별도 설치할 필요가 없습니다.
+# ※ pilmoji 가 이모지 렌더링을 담당합니다 (인터넷 연결 필요).
+
+streamlit>=1.32.0
+moviepy>=2.2.0
+Pillow>=10.2.0
+numpy>=1.26.0
+imageio>=2.33.0
+imageio-ffmpeg>=0.4.9
+pilmoji>=2.0.0
