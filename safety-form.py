@@ -53,8 +53,8 @@ def _strip_emoji(text: str) -> str:
 
 SUPPORTED_EXTS  = {".jpg", ".jpeg", ".png", ".webp", ".bmp"}
 SUPPORTED_AUDIO = ["mp3", "wav", "ogg", "aac", "m4a", "flac", "wma", "opus", "aiff"]
-DEFAULT_CLIP_SEC   = 3.5
-FADE_SEC           = 1.0
+DEFAULT_CLIP_SEC   = 3.0
+FADE_SEC           = 0.4
 AUDIO_FADEOUT_SEC  = 3.0
 CAPTION_FONT_SIZE  = 48
 
